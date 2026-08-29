@@ -1,0 +1,15 @@
+# This repo (raven-detection) intentionally tracks only:
+#   oaod_backend/, frontend/, website/models/*.pt, .gitattributes
+# Everything else in this working directory belongs to other efforts
+# (training notebooks, raw datasets, the separate website/ Flask repo,
+# yolov9/, stray model files) and must never be swept in by `git add .`.
+/*
+!/oaod_backend/
+!/frontend/
+!/website/
+/website/*
+!/website/models/
+/website/models/*
+!/website/models/*.pt
+!/.gitattributes
+!/.gitignore
