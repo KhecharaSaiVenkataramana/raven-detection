@@ -119,3 +119,61 @@ class StatsResponse(BaseModel):
     total: int
     total_objects: int
     avg_ms: float
+
+
+# ── Accident Scene Analysis (Incidents) ───────────────────────────────────────
+# Phase 1 is documentation only: vehicle positions + headings detected in a
+# single photo, reusing the existing DOTA-OBB model. No speed, trajectory, or
+# fault claims are made anywhere — this disclaimer is the single source of
+# truth for that framing and must appear on every incident-related PDF page
+# and frontend view. NOTE TO REVIEWER: exact wording needs explicit human
+# sign-off before shipping — adapt freely, keep the substance.
+INCIDENT_DISCLAIMER = (
+    "This report documents vehicle positions and headings detected in the uploaded "
+    "photo. It is an assistive aid, not a validated forensic determination — it makes "
+    "no claims about vehicle speed, fault, or the sequence of events."
+)
+
+
+class IncidentCreate(BaseModel):
+    """What the user sends when opening a new incident."""
+    title: str
+    reference_code: Optional[str] = None
+    notes: Optional[str] = None
+
+
+class EvidenceOut(BaseModel):
+    """One piece of evidence (photo/video) attached to an incident."""
+    id: int
+    incident_id: int
+    evidence_type: str
+    image_id: Optional[int] = None
+    video_id: Optional[int] = None
+    label: Optional[str] = None
+    uploaded_at: datetime
+    annotated_image_url: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class IncidentOut(BaseModel):
+    """Incident record returned to the client."""
+    id: int
+    title: str
+    reference_code: Optional[str]
+    status: str
+    created_at: datetime
+    updated_at: datetime
+    notes: Optional[str]
+    evidence: list[EvidenceOut] = []
+    disclaimer: str = INCIDENT_DISCLAIMER
+
+    class Config:
+        from_attributes = True
+
+
+class IncidentListResponse(BaseModel):
+    """List of incidents belonging to the current user."""
+    total: int
+    incidents: list[IncidentOut]

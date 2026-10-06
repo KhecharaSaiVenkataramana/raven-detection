@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import ZoomImage from "@/components/ZoomImage";
 import { useLoadingOverlay } from "@/components/LoadingOverlay";
 import type { DetectionMode, PredictBatchResponse } from "@/lib/types";
@@ -220,6 +221,13 @@ export default function DetectionPage() {
                   )}
                 </div>
               </div>
+
+              <p style={{ fontSize: 12.5, marginBottom: 16 }}>
+                Investigating a post-accident scene?{" "}
+                <Link href="/incidents/new" style={{ color: "var(--cyan)" }}>
+                  Start an Incident from this image →
+                </Link>
+              </p>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 24 }}>
                 {result.results.map((r) => (

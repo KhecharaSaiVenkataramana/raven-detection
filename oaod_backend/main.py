@@ -22,7 +22,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from database.session import create_tables
-from routers import auth, predict, history, reports, contact
+from routers import auth, predict, history, reports, contact, incidents
 
 # ── Create the FastAPI app ────────────────────────────────────────────────────
 app = FastAPI(
@@ -55,6 +55,7 @@ app.include_router(predict.router)
 app.include_router(history.router)
 app.include_router(reports.router)
 app.include_router(contact.router)
+app.include_router(incidents.router)
 
 # ── Create DB tables on startup (safe to call multiple times) ─────────────────
 @app.on_event("startup")
