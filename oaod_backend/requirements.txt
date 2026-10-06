@@ -13,3 +13,4 @@ numpy==2.3.1
 pillow==11.2.1
 reportlab==4.4.10
 pymysql==1.1.2
+alembic==1.20.0
