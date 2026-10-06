@@ -6,7 +6,7 @@ Clean functions for creating and querying users, images, detections.
 from datetime import datetime
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-from .models import User, Image, Detection
+from .models import User, Image, Detection, Incident, Evidence
 
 
 # ── Users ─────────────────────────────────────────────────────────────────────
@@ -190,5 +190,81 @@ def get_detections_by_user(db: Session, user_id: int, limit: int = 200) -> list[
         .filter(Image.user_id == user_id)
         .order_by(Detection.image_id.desc())
         .limit(limit)
+        .all()
+    )
+
+
+# ── Incidents (Accident Scene Analysis) ────────────────────────────────────────
+
+def create_incident(
+    db: Session,
+    user_id: int,
+    title: str,
+    reference_code: str = None,
+    notes: str = None,
+) -> Incident:
+    incident = Incident(
+        user_id=user_id,
+        title=title,
+        reference_code=reference_code,
+        notes=notes,
+        status="open",
+    )
+    db.add(incident)
+    db.commit()
+    db.refresh(incident)
+    return incident
+
+
+def get_incident_by_id(db: Session, incident_id: int) -> Incident | None:
+    return db.query(Incident).filter(Incident.id == incident_id).first()
+
+
+def get_incidents_by_user(db: Session, user_id: int, limit: int = 100) -> list[Incident]:
+    return (
+        db.query(Incident)
+        .filter(Incident.user_id == user_id)
+        .order_by(Incident.created_at.desc())
+        .limit(limit)
+        .all()
+    )
+
+
+def update_incident_status(db: Session, incident_id: int, status: str) -> Incident | None:
+    incident = db.query(Incident).filter(Incident.id == incident_id).first()
+    if incident:
+        incident.status = status
+        incident.updated_at = datetime.utcnow()
+        db.commit()
+        db.refresh(incident)
+    return incident
+
+
+def add_evidence(
+    db: Session,
+    incident_id: int,
+    evidence_type: str,
+    image_id: int = None,
+    video_id: int = None,
+    label: str = None,
+) -> Evidence:
+    evidence = Evidence(
+        incident_id=incident_id,
+        evidence_type=evidence_type,
+        image_id=image_id,
+        video_id=video_id,
+        label=label,
+    )
+    db.add(evidence)
+    db.commit()
+    db.refresh(evidence)
+    return evidence
+
+
+def get_evidence_by_incident(db: Session, incident_id: int) -> list[Evidence]:
+    return (
+        db.query(Evidence)
+        .filter(Evidence.incident_id == incident_id)
+        .order_by(Evidence.uploaded_at.asc())
         .all()
     )
